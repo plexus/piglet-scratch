@@ -1,4 +1,6 @@
 (module hello)
 
-(def xxx 123)
-(println "Oink!")
+
+
+:foo
+(name :foo/bar/baz)
