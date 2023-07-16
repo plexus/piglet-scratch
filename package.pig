@@ -1,3 +1,3 @@
-{:pkg:name https://piglet-scratch/
+{:pkg:name https://piglet.arnebrasseur.net/scratch
  :pkg:paths ["src"]
- :pkg:deps {solid {:pkg:location "http://localhost:9003"}}}
+ :pkg:deps {solid {:pkg:location "../piglet-solid"}}}
