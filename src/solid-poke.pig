@@ -7,6 +7,36 @@
 
 (def literal? #{"string" "boolean" "number" "bigint" js:Date js:RegExp Sym Keyword PrefixName QName QSym})
 
+(def kebab-case-tags
+  #{"accept-charset" "http-equiv" "accent-height"
+    "alignment-baseline" "arabic-form" "baseline-shift" "cap-height" "clip-path"
+    "clip-rule" "color-interpolation" "color-interpolation-filters" "color-profile"
+    "color-rendering" "fill-opacity" "fill-rule" "flood-color" "flood-opacity"
+    "font-family" "font-size" "font-size-adjust" "font-stretch" "font-style"
+    "font-variant" "font-weight" "glyph-name" "glyph-orientation-horizontal"
+    "glyph-orientation-vertical" "horiz-adv-x" "horiz-origin-x" "marker-end"
+    "marker-mid" "marker-start" "overline-position" "overline-thickness" "panose-1"
+    "paint-order" "stop-color" "stop-opacity" "strikethrough-position"
+    "strikethrough-thickness" "stroke-dasharray" "stroke-dashoffset"
+    "stroke-linecap" "stroke-linejoin" "stroke-miterlimit" "stroke-opacity"
+    "stroke-width" "text-anchor" "text-decoration" "text-rendering"
+    "underline-position" "underline-thickness" "unicode-bidi" "unicode-range"
+    "units-per-em" "v-alphabetic" "v-hanging" "v-ideographic" "v-mathematical"
+    "vert-adv-y" "vert-origin-x" "vert-origin-y" "word-spacing" "writing-mode"
+    "x-height"})
+
+(def svg-tags
+  #{"a" "animate" "animateMotion" "animateTransform" "circle"
+    "clipPath" "defs" "desc" "ellipse" "feBlend" "feColorMatrix"
+    "feComponentTransfer" "feComposite" "feConvolveMatrix" "feDiffuseLighting"
+    "feDisplacementMap" "feDistantLight" "feDropShadow" "feFlood" "feFuncA"
+    "feFuncB" "feFuncG" "feFuncR" "feGaussianBlur" "feImage" "feMerge" "feMergeNode"
+    "feMorphology" "feOffset" "fePointLight" "feSpecularLighting" "feSpotLight"
+    "feTile" "feTurbulence" "filter" "foreignObject" "g" "hatch" "hatchpath" "image"
+    "line" "linearGradient" "marker" "mask" "metadata" "mpath" "path" "pattern"
+    "polygon" "polyline" "radialGradient" "rect" "script" "set" "stop" "style" "svg"
+    "switch" "symbol" "text" "textPath" "title" "tspan" "use" "view"})
+
 (defn text-node [s]
   (dom:text-node js:document (str s)))
 
@@ -212,4 +242,7 @@
   "<a>oink :groink :foaf:name https://piglet.arnebrasseur.net/scratch:solid-poke:foo</a>")
 
 (let [x #js {}]
-  (assoc-in! x [:x :y] 1))
+  (assoc-in! x [:x :y] 1)
+  (update-in! x [:x :y] inc)
+  x)
+=> #js {:x #js {:y 2}}
