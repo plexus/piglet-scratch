@@ -38,7 +38,7 @@
 
 (defn coerce [s]
   (let [v (:value s)]
-    (if (and (string? v) (str:starts-with v "http://"))
+    (if (and (string? v) (str:starts-with? v "http://"))
       (qname v)
       v)))
 
