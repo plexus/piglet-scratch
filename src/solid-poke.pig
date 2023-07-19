@@ -3,9 +3,11 @@
     [h :from "solid-js/h"]
     [web :from "solid-js/web"]
     [pigsolid :from solid:solid]
-    piglet:dom))
+    piglet:dom
+    piglet:string))
 
-(def literal? #{"string" "boolean" "number" "bigint" js:Date js:RegExp Sym Keyword PrefixName QName QSym})
+(def literal? #{"string" "boolean" "number" "bigint"
+                js:Date js:RegExp Sym Keyword PrefixName QName QSym})
 
 (def kebab-case-tags
   #{"accept-charset" "http-equiv" "accent-height"
@@ -37,6 +39,16 @@
     "polygon" "polyline" "radialGradient" "rect" "script" "set" "stop" "style" "svg"
     "switch" "symbol" "text" "textPath" "title" "tspan" "use" "view"})
 
+(defn convert-attr-name [attr]
+  (let [attr (name attr)]
+    (if (or
+          (kebab-case-tags attr)
+          (string:starts-with? attr "data-")
+          (string:starts-with? attr "aria-")
+          (string:starts-with? attr "hx-"))
+      attr
+      (string:kebap->dromedary attr))))
+
 (defn text-node [s]
   (dom:text-node js:document (str s)))
 
@@ -54,15 +66,19 @@
         (web:createComponent (fn [props]
                                (h (apply tag (.-children props))))
           #js {:children children})
-        (let [el (dom:create-el js:document tag)
+        (let [svg? (boolean (svg-tags (name tag)))
+              el (if svg?
+                   (dom:create-el js:document  "http://www.w3.org/2000/svg" tag)
+                   (dom:create-el js:document tag))
               props #js {}]
           (when (dict? (first children))
             (doseq [[k v] (first children)]
-              (if (fn? v)
-                (js:Object.defineProperty props (name k)
-                  #js {:get v :enumerable true})
-                (assoc! props k v)))
-            (web:spread el props false true))
+              (let [k (convert-attr-name k)]
+                (if (fn? v)
+                  (js:Object.defineProperty props (name k)
+                    #js {:get v :enumerable true})
+                  (assoc! props k v))))
+            (web:spread el props svg? true))
           (doseq [ch (cond-> children
                        (dict? (first children))
                        rest)]
@@ -225,6 +241,10 @@
   (fn [] (h [:a {:href (fn [] "/oink")} "Oink!"]))
   "<a href=\"/oink\">Oink!</a>")
 
+(test
+  (fn [] (h [:svg {:view-box "0 0 20 20"} [:g]]))
+  "<svg viewBox=\"0 0 20 20\"><g></g></svg>")
+
 (let [s (pigsolid:signal 1)
       c (fn []
           [:a {:href (fn [] (str "/oink/" @s))} "Oink!"])
@@ -240,9 +260,3 @@
              :foaf:name " "
              `foo]))
   "<a>oink :groink :foaf:name https://piglet.arnebrasseur.net/scratch:solid-poke:foo</a>")
-
-(let [x #js {}]
-  (assoc-in! x [:x :y] 1)
-  (update-in! x [:x :y] inc)
-  x)
-=> #js {:x #js {:y 2}}
